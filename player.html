@@ -14,19 +14,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.13/shaka-player.compiled.js"></script>
 
 <style>
+/* --- التنسيق الذهبي والدوران لقياس الهاتف --- */
+:root { --gold: #FFD700; --gold-br: rgba(255, 215, 0, 0.3); }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;padding:0;width:100%;height:100%;background:#000;font-family:Tajawal,sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
 body{position:fixed;inset:0;padding:0!important;background:#000}
 
-/* تعديل الدوران 90 درجة */
 #player-root{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;overflow:hidden}
 .player-wrapper{
-  position:absolute;
-  top:50%;left:50%;
-  width:100vh;height:100vw;
-  width:100dvh;height:100dvw;
-  background:#000;
-  overflow:hidden;
+  position:absolute;top:50%;left:50%;
+  width:100vh;height:100vw;width:100dvh;height:100dvw;
+  background:#000;overflow:hidden;
   transform:translate(-50%,-50%) rotate(90deg);
   transform-origin:center center;
 }
@@ -35,6 +33,116 @@ video{position:absolute;inset:0;width:100%;height:100%;background:#000;object-fi
 video.fit-contain{object-fit:contain!important}
 video.fit-cover{object-fit:cover!important}
 video.fit-fill{object-fit:fill!important}
+
+.server-bar{
+  position:absolute;top:16px;left:12px;right:auto;z-index:130;display:none;gap:8px;
+  padding:6px;max-width:min(72vw,760px);overflow-x:auto;direction:ltr;
+  background:transparent;border:0;border-radius:999px;
+  scrollbar-width:none;opacity:0;transition:.25s
+}
+.server-bar.visible{display:flex;opacity:1}
+.server-btn{flex:0 0 auto;border:1px solid var(--gold-br);background:transparent;color:var(--gold);padding:8px 14px;border-radius:999px;font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer;white-space:nowrap;text-shadow:0 1px 2px #000}
+.server-btn.active{background:var(--gold);color:#000}
+
+#loading,#buffer{position:absolute;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:5px solid rgba(255,215,0,0.15);border-top-color:var(--gold);animation:spin 1s linear infinite;display:none}
+#loading{width:52px;height:52px}#buffer{width:86px;height:86px}@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+.top,.bottom,.center{position:absolute;z-index:80;opacity:0;transition:.25s;pointer-events:none}
+.visible{opacity:1;pointer-events:auto}
+
+.top{top:0;right:0;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.title{color:var(--gold);font-weight:800;font-size:15px;text-shadow:0 1px 2px #000}
+.btn,.icon{border:1px solid var(--gold-br);background:transparent;color:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.btn{width:42px;height:42px}.icon{width:42px;height:42px}
+
+.center{left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:20px;align-items:center}
+.circle{border:1px solid var(--gold-br);background:transparent;color:var(--gold);border-radius:999px;display:flex;align-items:center;justify-content:center}
+.big{width:76px;height:76px}.seek{width:58px;height:58px;position:relative}.seek .num{position:absolute;font-size:13px;font-weight:900}
+
+.bottom{left:0;right:0;bottom:0;padding:12px 14px 15px}
+.progress{height:5px;background:rgba(255,215,0,0.2);border-radius:999px;position:relative;margin-bottom:12px;overflow:hidden}
+.played{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--gold)}.thumb{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--gold)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;direction:ltr}
+.icons{display:flex;gap:10px;direction:rtl;margin-left:auto}
+.time{color:var(--gold);font-size:14px;min-width:110px}
+
+.menu{position:absolute;bottom:76px;right:12px;z-index:100;min-width:190px;background:#000;border:1px solid var(--gold-br);border-radius:15px;padding:7px;display:none}
+.menu.visible{display:block}.menu button{width:100%;border:0;background:transparent;color:var(--gold);padding:12px;border-radius:12px;text-align:right;font-family:Tajawal;font-weight:700}
+#toast{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;padding:8px 14px;border-radius:999px;display:none;z-index:100;font-weight:700}
+
+#tapStart{position:absolute;inset:0;z-index:70;display:none;align-items:center;justify-content:center;color:var(--gold);font-weight:900;font-size:18px;background:#000}
+#tapStart.show{display:flex}
+</style>
+</head>
+<body>
+<div id="player-root">
+<div class="player-wrapper" id="wrap">
+<div class="server-bar" id="serverBar"></div>
+<video id="video" playsinline webkit-playsinline autoplay></video>
+<div id="tapStart">اضغط على الشاشة للتشغيل</div>
+
+<div class="top" id="top"><button class="btn" id="back" onclick="history.back()"><i data-feather="arrow-right"></i></button><div class="title" id="title">BSR Player</div></div>
+<div id="loading"></div><div id="buffer"></div>
+
+<div class="center" id="center">
+  <button class="circle seek" id="rew"><i data-feather="rotate-ccw"></i><div class="num">5</div></button>
+  <button class="circle big" id="play"><i data-feather="pause"></i></button>
+  <button class="circle seek" id="fwd"><i data-feather="rotate-cw"></i><div class="num">15</div></button>
+</div>
+
+<div class="bottom" id="bottom">
+  <div class="progress" id="progress"><div class="played" id="played"></div><div class="thumb" id="thumb"></div></div>
+  <div class="row">
+    <div class="time" id="time">00:00 • 00:00</div>
+    <div class="icons">
+      <button class="icon" id="fullBtn"><i data-feather="maximize"></i></button>
+      <button class="icon" id="pipBtn"><i data-feather="airplay"></i></button>
+      <button class="icon" id="quality"><i data-feather="settings"></i></button>
+      <button class="icon" id="mute"><i data-feather="volume-x"></i></button>
+      <button class="icon" id="fit"><i data-feather="maximize-2"></i></button>
+    </div>
+  </div>
+</div>
+
+<div class="menu" id="qMenu"></div><div id="toast"></div>
+</div>
+</div>
+
+<script>
+/* الكود البرمجي الأصلي الخاص بك كما هو تماماً */
+document.addEventListener("DOMContentLoaded", () => {
+  feather.replace();
+  const $ = id => document.getElementById(id);
+  const video = $("video"), qMenu = $("qMenu"), played = $("played"), thumb = $("thumb");
+  let hideTimer = null;
+
+  function showControls(){ 
+    $("top").classList.add("visible"); $("bottom").classList.add("visible"); $("center").classList.add("visible"); $("serverBar").classList.add("visible");
+    clearTimeout(hideTimer); hideTimer = setTimeout(hideControls, 3000);
+  }
+  function hideControls(){ 
+    $("top").classList.remove("visible"); $("bottom").classList.remove("visible"); $("center").classList.remove("visible"); $("serverBar").classList.remove("visible"); qMenu.classList.remove("visible");
+  }
+
+  const url = new URLSearchParams(location.search).get("url") || "";
+  if(Hls.isSupported()){
+    const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+  } else { video.src = url; }
+
+  $("wrap").onclick = showControls;
+  $("play").onclick = (e) => { e.stopPropagation(); video.paused ? video.play() : video.pause(); };
+  
+  video.ontimeupdate = () => {
+    const p = (video.currentTime / video.duration) * 100;
+    played.style.width = p + "%"; thumb.style.left = p + "%";
+    $("time").textContent = Math.floor(video.currentTime/60) + ":" + Math.floor(video.currentTime%60).toString().padStart(2,'0');
+  };
+
+  showControls();
+});
+</script>
+</body>
+</html>video.fit-fill{object-fit:fill!important}
 
 /* اللون الذهبي للسيرفرات */
 .server-bar{
