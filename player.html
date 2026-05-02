@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8"/>
@@ -23,7 +24,6 @@ video.fit-contain{object-fit:contain!important}
 video.fit-cover{object-fit:cover!important}
 video.fit-fill{object-fit:fill!important}
 
-/* التنسيق الذهبي للسيرفرات */
 .server-bar{
   position:absolute;top:16px;left:12px;right:auto;z-index:130;display:none;gap:8px;
   padding:6px;max-width:min(72vw,760px);overflow-x:auto;direction:ltr;
@@ -36,7 +36,6 @@ video.fit-fill{object-fit:fill!important}
 .server-btn{flex:0 0 auto;border:1px solid rgba(255,215,0,0.4);background:transparent;color:#FFD700;padding:8px 14px;border-radius:999px;font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer;white-space:nowrap;text-shadow:0 1px 2px #000}
 .server-btn.active{background:#FFD700;color:#000}
 
-/* لون التحميل الذهبي */
 #loading,#buffer{position:absolute;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:5px solid rgba(255,215,0,0.2);border-top-color:#FFD700;animation:spin 1s linear infinite;display:none}
 #loading{width:52px;height:52px}#buffer{width:86px;height:86px}@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
@@ -47,7 +46,6 @@ video.fit-fill{object-fit:fill!important}
 .top.visible,.bottom.visible,.center.visible{opacity:1;pointer-events:auto}
 .title{color:#FFD700;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw;text-align:right;text-shadow:0 1px 2px #000}
 
-/* أزرار التحكم الذهبية */
 .btn,.icon{border:1px solid rgba(255,215,0,0.3);background:transparent;color:#FFD700;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-shadow:0 1px 2px #000}
 .btn{width:42px;height:42px}.icon{width:42px;height:42px}
 
@@ -59,7 +57,6 @@ video.fit-fill{object-fit:fill!important}
 .bottom{position:absolute;left:0;right:0;bottom:0;z-index:80;padding:12px 14px 15px;background:transparent;opacity:0;transition:.25s;pointer-events:none}
 .bottom.visible{pointer-events:auto}
 
-/* شريط التقدم الذهبي */
 .progress{height:5px;background:rgba(255,215,0,0.15);border-radius:999px;position:relative;margin-bottom:12px;overflow:hidden}
 .played{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg, #b8860b, #FFD700)}.thumb{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#FFD700;box-shadow:0 0 8px #FFD700}
 
@@ -156,15 +153,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function forceMobileFullscreen(){
     try{ window.scrollTo(0,1); }catch{}
-    try{ document.documentElement.requestFullscreen && !document.fullscreenElement && await document.documentElement.requestFullscreen({navigationUI:"hide"}); }catch{}
-    try{ wrap.requestFullscreen && !document.fullscreenElement && await wrap.requestFullscreen({navigationUI:"hide"}); }catch{}
+    try{ if(wrap.requestFullscreen) await wrap.requestFullscreen({navigationUI:"hide"}); }catch{}
     try{ if(screen.orientation?.lock) await screen.orientation.lock("landscape").catch(()=>{}); }catch{}
     try{
       const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if(isiOS && video.webkitEnterFullscreen && !document.fullscreenElement) video.webkitEnterFullscreen();
+      if(isiOS && video.webkitEnterFullscreen) video.webkitEnterFullscreen();
     }catch{}
-    try{ if(navigator.wakeLock) await navigator.wakeLock.request("screen").catch(()=>{}); }catch{}
   }
+
+  // --- ميزة التدوير التلقائي الجديدة ---
+  function initAutoRotation() {
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', async () => {
+        if (screen.orientation.type.includes('landscape')) {
+          await forceMobileFullscreen().catch(()=>{});
+        } else if (screen.orientation.type.includes('portrait')) {
+          if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+        }
+      });
+    }
+  }
+  initAutoRotation();
+  // ------------------------------------
+
   function hideControls(){topBar.classList.remove("visible");bottom.classList.remove("visible");center.classList.remove("visible");serverBar.classList.add("hide");qMenu.classList.remove("visible")}
   function showControls(){topBar.classList.add("visible");bottom.classList.add("visible");center.classList.add("visible");serverBar.classList.remove("hide");clearTimeout(hideTimer);hideTimer=setTimeout(hideControls,2500)}
   function flash(t){toast.textContent=t;toast.style.display="block";setTimeout(()=>toast.style.display="none",1300)}
@@ -172,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function setMuteIcon(){muteBtn.innerHTML=`<i data-feather="${video.muted?'volume-x':'volume-2'}"></i>`;feather.replace()}
   const fmt=s=>!isFinite(s)||s<0?"00:00":`${Math.floor(s/60)%60}`.padStart(2,"0")+":"+`${Math.floor(s%60)}`.padStart(2,"0");
   function updateProgress(){const d=video.duration||0,c=video.currentTime||0;if(d>0&&isFinite(d)){const r=(c/d)*100;played.style.width=r+"%";thumb.style.left=r+"%";time.style.display="block";live.style.display="none";time.textContent=`${fmt(c)} • ${fmt(d)}`}else{played.style.width="100%";thumb.style.left="100%";time.style.display="none";live.style.display="flex"}}
+  
   async function startVideoAfterLoad(){
     tapStart.classList.remove("show");
     try{ await video.play(); }
