@@ -2,28 +2,18 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<title>Bryan Player Mobile - Golden Edition</title>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="theme-color" content="#000000"/>
+<title>Video Player</title>
 
-<!-- المكتبات الأساسية -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.13/shaka-player.compiled.js"></script>
 
 <style>
-/* التنسيقات العامة */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{margin:0;padding:0;width:100%;height:100%;background:#000;font-family:Tajawal,sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
-body{position:fixed;inset:0;padding:0!important;background:#000}
-#player-root,.player-wrapper{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;overflow:hidden}
+html,body{margin:0;padding:0;width:100%;height:100%;background:#000;font-family:Tajawal,sans-serif;overflow:hidden}
 
-/* حاوية الفيديو ودعم التدوير */
-#video-container {
-    position: absolute;
+#player-root {
+    position: fixed;
     inset: 0;
     display: flex;
     align-items: center;
@@ -31,106 +21,177 @@ body{position:fixed;inset:0;padding:0!important;background:#000}
     background: #000;
 }
 
-video{
+#wrap {
     position: relative;
     width: 100%;
     height: 100%;
-    background:#000;
-    object-fit:fill;
-    filter:contrast(1.05) saturate(1.1);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s, height 0.4s;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-video.fit-contain{object-fit:contain!important}
-video.fit-cover{object-fit:cover!important}
-video.fit-fill{object-fit:fill!important}
-
-/* شريط السيرفرات */
-.server-bar{
-  position:absolute;top:16px;left:12px;z-index:130;display:none;gap:8px;
-  padding:6px;max-width:80%;overflow-x:auto;direction:ltr;
-  background:transparent;opacity:0;transition:.25s
+.rotated {
+    width: 100vh !important;
+    height: 100vw !important;
+    transform: rotate(90deg);
 }
-.server-bar::-webkit-scrollbar{display:none}
-.server-bar.visible{display:flex;opacity:1}
-.server-bar.hide{opacity:0;pointer-events:none}
-.server-btn{flex:0 0 auto;border:1px solid rgba(255,215,0,0.4);background:rgba(0,0,0,0.5);color:#FFD700;padding:8px 14px;border-radius:999px;font-family:Tajawal;font-weight:800;cursor:pointer;white-space:nowrap}
-.server-btn.active{background:#FFD700;color:#000}
 
-/* مؤشرات التحميل */
-#loading,#buffer{position:absolute;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:5px solid rgba(255,215,0,0.2);border-top-color:#FFD700;animation:spin 1s linear infinite;display:none}
-#loading{width:52px;height:52px}#buffer{width:86px;height:86px}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    background: #000;
+}
 
-/* واجهة التحكم */
-.top,.bottom,.center{position:absolute;z-index:140;transition:.25s;opacity:0;pointer-events:none}
-.visible{opacity:1;pointer-events:auto}
+.ui-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-.top{top:0;right:0;left:0;padding:14px;display:flex;align-items:center;gap:12px}
-.title{color:#FFD700;font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px #000}
+.ui-layer.visible { opacity: 1; pointer-events: auto; }
 
-.btn,.icon{border:1px solid rgba(255,215,0,0.3);background:rgba(0,0,0,0.3);color:#FFD700;border-radius:12px;display:flex;align-items:center;justify-content:center;width:42px;height:42px}
+.top-bar, .bottom-bar {
+    padding: 20px;
+    background: linear-gradient(rgba(0,0,0,0.85), transparent);
+}
 
-.center{left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:25px;align-items:center}
-.circle{border:2px solid #FFD700;background:transparent;color:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.big{width:75px;height:75px;box-shadow:0 0 20px rgba(255,215,0,0.3)}
-.seek{width:55px;height:55px;position:relative}.seek .num{position:absolute;font-size:12px;font-weight:900}
+.bottom-bar { background: linear-gradient(transparent, rgba(0,0,0,0.9)); }
 
-.bottom{bottom:0;left:0;right:0;padding:15px;background:linear-gradient(transparent, rgba(0,0,0,0.8))}
-.progress{height:6px;background:rgba(255,215,0,0.2);border-radius:10px;position:relative;margin-bottom:15px;cursor:pointer}
-.played{position:absolute;height:100%;background:#FFD700;width:0;border-radius:10px}
-.thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#FFD700;border-radius:50%;box-shadow:0 0 10px #FFD700}
+.btn-icon {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,215,0,0.5);
+    color: #FFD700;
+    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
 
-.row{display:flex;align-items:center;justify-content:space-between;direction:ltr}
-.time{color:#FFD700;font-size:13px;min-width:100px}
-.icons{display:flex;gap:8px;direction:rtl}
+.center-controls {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 35px;
+    align-items: center;
+}
 
-#toast{position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(184,134,11,0.9);color:#fff;padding:8px 16px;border-radius:20px;display:none;z-index:200;border:1px solid #FFD700;font-weight:700}
-#tapStart{position:absolute;inset:0;z-index:160;display:none;align-items:center;justify-content:center;color:#FFD700;font-weight:900;background:#000}
-#tapStart.show{display:flex}
+.play-main {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #FFD700;
+    background: rgba(0,0,0,0.3);
+    color: #FFD700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-#error{position:absolute;inset:0;z-index:1000;background:#000;color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-#error button{margin-top:15px;padding:10px 25px;background:#FFD700;border:0;border-radius:20px;font-weight:800;font-family:Tajawal}
+.progress-wrap {
+    height: 6px;
+    background: rgba(255,215,0,0.15);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+.progress-fill {
+    height: 100%;
+    background: #FFD700;
+    width: 0%;
+    box-shadow: 0 0 10px rgba(255,215,0,0.6);
+}
+
+.bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    direction: ltr;
+}
+
+.icons-group {
+    display: flex;
+    gap: 10px;
+    direction: rtl;
+}
+
+#loader {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255,215,0,0.1);
+    border-top-color: #FFD700;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+    z-index: 150;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#toast {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(184,134,11,0.95);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-weight: bold;
+    display: none;
+    z-index: 200;
+}
 </style>
 </head>
 <body>
 
 <div id="player-root">
-    <div class="player-wrapper" id="wrap">
-        <div class="server-bar" id="serverBar"></div>
-        <div id="video-container">
-            <video id="video" playsinline webkit-playsinline preload="auto"></video>
-        </div>
-        
-        <div id="tapStart">اضغط هنا لبدء التشغيل</div>
-        <div id="loading"></div><div id="buffer"></div>
+    <div id="wrap">
+        <video id="video" playsinline></video>
+        <div id="loader"></div>
 
-        <div id="error">
-            <h3 id="errTitle">خطأ في التحميل</h3>
-            <p id="errMsg">الرابط غير متاح حالياً</p>
-            <button onclick="location.reload()">إعادة المحاولة</button>
-        </div>
+        <div class="ui-layer" id="ui">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center;">
+                    <button class="btn-icon" onclick="history.back()"><i data-feather="arrow-right"></i></button>
+                </div>
+            </div>
 
-        <div class="top" id="top">
-            <button class="btn" onclick="history.back()"><i data-feather="arrow-right"></i></button>
-            <div class="title" id="title">Beryan.TV Player</div>
-        </div>
+            <div class="center-controls">
+                <button class="btn-icon" onclick="video.currentTime -= 10"><i data-feather="rotate-ccw"></i></button>
+                <button class="play-main" id="playBtn"><i data-feather="play"></i></button>
+                <button class="btn-icon" onclick="video.currentTime += 10"><i data-feather="rotate-cw"></i></button>
+            </div>
 
-        <div class="center" id="center">
-            <button class="circle seek" id="rew"><i data-feather="rotate-ccw"></i><div class="num">10</div></button>
-            <button class="circle big" id="play"><i data-feather="play"></i></button>
-            <button class="circle seek" id="fwd"><i data-feather="rotate-cw"></i><div class="num">10</div></button>
-        </div>
-
-        <div class="bottom" id="bottom">
-            <div class="progress" id="progress"><div class="played" id="played"></div><div class="thumb" id="thumb"></div></div>
-            <div class="row">
-                <div class="time" id="time">00:00 / 00:00</div>
-                <div class="icons">
-                    <button class="icon" id="fullBtn"><i data-feather="maximize"></i></button>
-                    <button class="icon" id="rotateBtn"><i data-feather="refresh-cw"></i></button>
-                    <button class="icon" id="fit"><i data-feather="move"></i></button>
-                    <button class="icon" id="mute"><i data-feather="volume-2"></i></button>
+            <div class="bottom-bar">
+                <div class="progress-wrap" id="progressArea">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="bottom-row">
+                    <div id="timeLabel" style="color:#FFD700; font-size:13px; font-weight:bold;">00:00 / 00:00</div>
+                    <div class="icons-group">
+                        <button class="btn-icon" id="rotateBtn"><i data-feather="refresh-cw"></i></button>
+                        <button class="btn-icon" id="fullBtn"><i data-feather="maximize"></i></button>
+                        <button class="btn-icon" id="fitBtn"><i data-feather="maximize-2"></i></button>
+                        <button class="btn-icon" onclick="showToast('الجودة تلقائية')"><i data-feather="settings"></i></button>
+                        <button class="btn-icon" onclick="showToast('لا توجد ترجمة')"><i data-feather="message-square"></i></button>
+                        <button class="btn-icon" id="muteBtn"><i data-feather="volume-2"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -141,143 +202,86 @@ video.fit-fill{object-fit:fill!important}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     feather.replace();
-    const $ = id => document.getElementById(id);
-    const video = $("video"), topBar = $("top"), bottom = $("bottom"), center = $("center"), loading = $("loading"), buffer = $("buffer");
-    const playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), fullBtn = $("fullBtn"), rotateBtn = $("rotateBtn"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), toast = $("toast"), tapStart = $("tapStart"), serverBar = $("serverBar");
+    const video = document.getElementById("video");
+    const wrap = document.getElementById("wrap");
+    const ui = document.getElementById("ui");
+    const playBtn = document.getElementById("playBtn");
+    const rotateBtn = document.getElementById("rotateBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const fitBtn = document.getElementById("fitBtn");
+    const fullBtn = document.getElementById("fullBtn");
+    const loader = document.getElementById("loader");
 
-    let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, isRotated = false;
-    const WORKER = "https://ali.albesriali8.workers.dev/";
+    let isRotated = false;
+    let uiTimer;
+    let fitIndex = 0;
 
-    // جلب المعطيات
-    const getParam = k => new URLSearchParams(location.search).get(k) || "";
-    function decodeServers(){
-        let raw = getParam("servers");
-        if(!raw) return null;
-        try { return JSON.parse(decodeURIComponent(escape(atob(raw)))); } catch { return null; }
-    }
+    rotateBtn.onclick = (e) => {
+        e.stopPropagation();
+        isRotated = !isRotated;
+        wrap.classList.toggle("rotated", isRotated);
+        showControls();
+    };
 
-    const isMpd = u => u.includes(".mpd");
-    const isHls = u => u.includes(".m3u8") || u.includes(".png") || u.includes(".json");
-
-    function updateOrientation() {
-        if (isRotated) {
-            const w = window.innerWidth, h = window.innerHeight;
-            video.style.width = h + "px";
-            video.style.height = w + "px";
-            video.style.transform = "rotate(90deg)";
-        } else {
-            video.style.width = "100%";
-            video.style.height = "100%";
-            video.style.transform = "rotate(0deg)";
-        }
-    }
-
-    async function playSource(url, title, ck, ref, ua) {
-        loading.style.display = "block";
-        if(hls) { hls.destroy(); hls = null; }
-        if(shakaPlayer) { await shakaPlayer.destroy(); shakaPlayer = null; }
-        
-        $("title").textContent = title || "BSR Player";
-        const finalUrl = (isMpd(url)) ? url : `${WORKER}?url=${encodeURIComponent(url)}&ua=${encodeURIComponent(ua||navigator.userAgent)}&ref=${encodeURIComponent(ref||new URL(url).origin)}`;
-
-        if(isMpd(url)) {
-            shaka.polyfill.installAll();
-            shakaPlayer = new shaka.Player(video);
-            if(ck) {
-                const [kid, key] = ck.split(":");
-                shakaPlayer.configure({drm:{clearKeys:{[kid]:key}}});
-            }
-            await shakaPlayer.load(finalUrl);
-        } else if(Hls.isSupported()) {
-            hls = new Hls();
-            hls.loadSource(finalUrl);
-            hls.attachMedia(video);
-        } else {
-            video.src = finalUrl;
-        }
-        loading.style.display = "none";
-        video.play().catch(() => tapStart.classList.add("show"));
-    }
-
-    function showControls() {
-        [topBar, bottom, center, serverBar].forEach(el => el.classList.add("visible"));
-        serverBar.classList.remove("hide");
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => {
-            [topBar, bottom, center].forEach(el => el.classList.remove("visible"));
-            serverBar.classList.add("hide");
-        }, 3000);
-    }
-
-    function flash(msg) {
-        toast.textContent = msg;
-        toast.style.display = "block";
-        setTimeout(() => toast.style.display = "none", 2000);
-    }
-
-    // الأزرار
-    playBtn.onclick = () => { if(video.paused) video.play(); else video.pause(); };
-    muteBtn.onclick = () => { video.muted = !video.muted; };
-    rotateBtn.onclick = () => { isRotated = !isRotated; updateOrientation(); flash(isRotated ? "وضع العرض الأفقي" : "وضع العرض العادي"); };
-    
-    fitBtn.onclick = () => {
+    fitBtn.onclick = (e) => {
+        e.stopPropagation();
         const modes = ["fill", "contain", "cover"];
         fitIndex = (fitIndex + 1) % modes.length;
         video.style.objectFit = modes[fitIndex];
-        flash("وضع العرض: " + modes[fitIndex]);
+        showToast("وضع العرض المختار");
     };
 
-    fullBtn.onclick = () => {
-        if (!document.fullscreenElement) $("wrap").requestFullscreen();
+    function showControls() {
+        ui.classList.add("visible");
+        clearTimeout(uiTimer);
+        uiTimer = setTimeout(() => { if(!video.paused) ui.classList.remove("visible"); }, 3000);
+    }
+
+    function showToast(m) {
+        const t = document.getElementById("toast");
+        t.innerText = m; t.style.display="block";
+        setTimeout(()=> t.style.display="none", 2000);
+    }
+
+    wrap.onclick = showControls;
+
+    playBtn.onclick = (e) => {
+        e.stopPropagation();
+        if(video.paused) video.play(); else video.pause();
+    };
+
+    muteBtn.onclick = (e) => {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        muteBtn.innerHTML = `<i data-feather="${video.muted ? 'volume-x' : 'volume-2'}"></i>`;
+        feather.replace();
+    };
+
+    fullBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (!document.fullscreenElement) wrap.requestFullscreen();
         else document.exitFullscreen();
     };
 
-    $("rew").onclick = () => video.currentTime -= 10;
-    $("fwd").onclick = () => video.currentTime += 10;
-
-    tapStart.onclick = () => { video.play(); tapStart.classList.remove("show"); };
-
     video.onplay = () => { playBtn.innerHTML = '<i data-feather="pause"></i>'; feather.replace(); };
     video.onpause = () => { playBtn.innerHTML = '<i data-feather="play"></i>'; feather.replace(); };
-    video.onwaiting = () => buffer.style.display = "block";
-    video.onplaying = () => buffer.style.display = "none";
+    video.onwaiting = () => loader.style.display = "block";
+    video.onplaying = () => loader.style.display = "none";
 
     video.ontimeupdate = () => {
         const p = (video.currentTime / video.duration) * 100;
-        played.style.width = p + "%";
-        thumb.style.left = p + "%";
+        document.getElementById("progressBar").style.width = p + "%";
         const fmt = s => new Date(s * 1000).toISOString().substr(11, 8).replace(/^00:/, '');
-        time.textContent = `${fmt(video.currentTime)} / ${fmt(video.duration || 0)}`;
+        document.getElementById("timeLabel").textContent = `${fmt(video.currentTime)} / ${fmt(video.duration || 0)}`;
     };
 
-    progress.onclick = e => {
-        const rect = progress.getBoundingClientRect();
-        video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
-    };
-
-    // التشغيل الأولي
-    const data = decodeServers();
-    if(data && data.servers.length > 0) {
-        serverBar.style.display = "flex";
-        data.servers.forEach((s, i) => {
-            const b = document.createElement("button");
-            b.className = "server-btn" + (i===0?" active":"");
-            b.textContent = s.name;
-            b.onclick = () => {
-                document.querySelectorAll(".server-btn").forEach(x=>x.classList.remove("active"));
-                b.classList.add("active");
-                playSource(s.url, data.title, s.ck, s.ref, s.ua);
-            };
-            serverBar.appendChild(b);
-        });
-        const s0 = data.servers[0];
-        playSource(s0.url, data.title, s0.ck, s0.ref, s0.ua);
-    } else {
-        playSource(getParam("url"), getParam("title"), getParam("ck"), getParam("ref"), getParam("ua"));
+    const url = new URLSearchParams(window.location.search).get("url");
+    if(url) {
+        if(url.includes(".m3u8") && Hls.isSupported()) {
+            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+        } else { video.src = url; }
+        video.play().catch(() => ui.classList.add("visible"));
     }
-
-    $("wrap").onclick = showControls;
-    window.onresize = updateOrientation;
 });
 </script>
 </body>
