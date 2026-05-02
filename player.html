@@ -1,9 +1,8 @@
-<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<title>BSR Player Mobile - Rotation Mode</title>
+<title>BSR Player Mobile</title>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -20,20 +19,34 @@ html,body{margin:0;padding:0;width:100%;height:100%;background:#000;font-family:
 body{position:fixed;inset:0;padding:0!important;background:#000}
 #player-root,.player-wrapper{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;overflow:hidden}
 
-/* تنسيقات الفيديو الأساسية */
-video{position:absolute;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;object-fit:fill;filter:contrast(1.06) saturate(1.12);transition: transform 0.3s ease;}
+/* تحسين انتقال الدوران */
+video, .top, .bottom, .center, .server-bar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s, height 0.4s, inset 0.4s; }
+
+video{position:absolute;inset:0;width:100vw;height:100vh;height:100dvh;background:#000;object-fit:fill;filter:contrast(1.06) saturate(1.12)}
 video.fit-contain{object-fit:contain!important}
 video.fit-cover{object-fit:cover!important}
 video.fit-fill{object-fit:fill!important}
 
-/* وضع الدوران 90 درجة مع ملء الشاشة */
-video.rotated {
-    width: 100vh !important; 
-    height: 100vw !important;
-    object-fit: cover !important;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(90deg);
+/* وضع الدوران الشامل */
+.rotate-90 video {
+  width: 100vh !important;
+  height: 100vw !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  object-fit: cover !important;
+}
+
+.rotate-90 .top, 
+.rotate-90 .bottom, 
+.rotate-90 .center,
+.rotate-90 .server-bar {
+  transform-origin: center;
+}
+
+/* دوران الأزرار والواجهة لتناسب وضع الـ 90 درجة */
+.rotate-90 .icon, .rotate-90 .btn, .rotate-90 .circle {
+  transform: rotate(-90deg);
 }
 
 .server-bar{
@@ -87,7 +100,7 @@ video.rotated {
 }
 </style>
 </head>
-<body>
+<body id="body">
 <div id="player-root">
 <div class="player-wrapper" id="wrap">
 
@@ -118,7 +131,7 @@ video.rotated {
       <button class="icon" id="quality" title="الجودة"><i data-feather="settings"></i></button>
       <button class="icon" id="ccBtn" title="الترجمة"><i data-feather="message-square"></i></button>
       <button class="icon" id="mute" title="الصوت"><i data-feather="volume-x"></i></button>
-      <button class="icon" id="fit" title="تغيير العرض"><i data-feather="refresh-cw"></i></button>
+      <button class="icon" id="fit" title="تغيير العرض"><i data-feather="maximize-2"></i></button>
     </div>
   </div>
 </div>
@@ -135,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const video = $("video"), topBar = $("top"), bottom = $("bottom"), center = $("center"), loading = $("loading"), buffer = $("buffer"), errorBox = $("error");
   const errTitle = $("errTitle"), errMsg = $("errMsg"), titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), qualityBtn = $("quality"), ccBtn = $("ccBtn"), castBtn = $("castBtn"), pipBtn = $("pipBtn"), fullBtn = $("fullBtn"), qMenu = $("qMenu"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), toast = $("toast"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart");
   const WORKER = "https://ali.albesriali8.workers.dev/";
-  let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, serverList = [], activeServerIndex = 0;
+  let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, serverList = [], activeServerIndex = 0, isRotated = false;
 
   const getP = () => new URLSearchParams(location.search);
   const get = k => { let v = getP().get(k)||""; try{v=decodeURIComponent(v)}catch{} return v; };
@@ -222,20 +235,24 @@ document.addEventListener("DOMContentLoaded", () => {
   $("rew").onclick=e=>{e.stopPropagation();if(isFinite(video.duration))video.currentTime=Math.max(0,video.currentTime-5);showControls()};
   $("fwd").onclick=e=>{e.stopPropagation();if(isFinite(video.duration))video.currentTime=Math.min(video.duration,video.currentTime+15);showControls()};
   muteBtn.onclick=e=>{e.stopPropagation();video.muted=!video.muted;setMuteIcon();flash(video.muted?"الصوت: كتم":"الصوت: تشغيل");showControls()};
-
-  // وظيفة الدوران وتغيير وضع العرض الجديدة
+  
+  // زر الدوران المطور مع الحفاظ على الوضع الأصلي
   fitBtn.onclick=e=>{
     e.stopPropagation();
-    const modes = ["normal", "rotated"];
-    fitIndex = (fitIndex + 1) % modes.length;
+    const wrap = $("wrap");
+    isRotated = !isRotated;
     
-    if(modes[fitIndex] === "rotated") {
-        video.classList.add("rotated");
-        flash("الوضع: دوران 90° ملء الشاشة");
+    if(isRotated) {
+      wrap.classList.add("rotate-90");
+      flash("تم تدوير العرض والواجهة 90°");
     } else {
-        video.classList.remove("rotated");
-        video.classList.add("fit-fill");
-        flash("الوضع: ملء الشاشة الطبيعي");
+      wrap.classList.remove("rotate-90");
+      // العودة للأوضاع الأصلية (تمدد، ملاءمة، قص)
+      const modes=["fit-fill","fit-contain","fit-cover"], names=["تمدد","ملاءمة","قص"];
+      video.classList.remove(...modes);
+      fitIndex=(fitIndex+1)%modes.length;
+      video.classList.add(modes[fitIndex]);
+      flash("العرض: "+names[fitIndex]);
     }
     showControls();
   };
