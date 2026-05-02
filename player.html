@@ -2,173 +2,50 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<title>Video Player</title>
+<title>Beryan.TV Player</title> <!-- تم تغيير العنوان هنا -->
 
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
+/* ... (نفس التنسيقات السابقة بدون تغيير) ... */
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;padding:0;width:100%;height:100%;background:#000;font-family:Tajawal,sans-serif;overflow:hidden}
-
-#player-root {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #000;
-}
-
-#wrap {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s, height 0.4s;
-    background: #000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.rotated {
-    width: 100vh !important;
-    height: 100vw !important;
-    transform: rotate(90deg);
-}
-
-video {
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    background: #000;
-}
-
-.ui-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
+#player-root { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+#wrap { position: relative; width: 100%; height: 100%; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s, height 0.4s; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.rotated { width: 100vh !important; height: 100vw !important; transform: rotate(90deg); }
+video { width: 100%; height: 100%; object-fit: fill; background: #000; }
+.ui-layer { position: absolute; inset: 0; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
 .ui-layer.visible { opacity: 1; pointer-events: auto; }
-
-.top-bar, .bottom-bar {
-    padding: 20px;
-    background: linear-gradient(rgba(0,0,0,0.85), transparent);
-}
-
+.top-bar, .bottom-bar { padding: 20px; background: linear-gradient(rgba(0,0,0,0.85), transparent); }
 .bottom-bar { background: linear-gradient(transparent, rgba(0,0,0,0.9)); }
-
-.btn-icon {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,215,0,0.5);
-    color: #FFD700;
-    border-radius: 12px;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.center-controls {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    gap: 35px;
-    align-items: center;
-}
-
-.play-main {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 2px solid #FFD700;
-    background: rgba(0,0,0,0.3);
-    color: #FFD700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.progress-wrap {
-    height: 6px;
-    background: rgba(255,215,0,0.15);
-    border-radius: 10px;
-    margin-bottom: 15px;
-    cursor: pointer;
-}
-.progress-fill {
-    height: 100%;
-    background: #FFD700;
-    width: 0%;
-    box-shadow: 0 0 10px rgba(255,215,0,0.6);
-}
-
-.bottom-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    direction: ltr;
-}
-
-.icons-group {
-    display: flex;
-    gap: 10px;
-    direction: rtl;
-}
-
-#loader {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(255,215,0,0.1);
-    border-top-color: #FFD700;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    display: none;
-    z-index: 150;
-}
+.btn-icon { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.5); color: #FFD700; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.center-controls { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 35px; align-items: center; }
+.play-main { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #FFD700; background: rgba(0,0,0,0.3); color: #FFD700; display: flex; align-items: center; justify-content: center; }
+.progress-wrap { height: 6px; background: rgba(255,215,0,0.15); border-radius: 10px; margin-bottom: 15px; cursor: pointer; }
+.progress-fill { height: 100%; background: #FFD700; width: 0%; box-shadow: 0 0 10px rgba(255,215,0,0.6); }
+.bottom-row { display: flex; align-items: center; justify-content: space-between; direction: ltr; }
+.icons-group { display: flex; gap: 10px; direction: rtl; }
+#loader { position: absolute; width: 60px; height: 60px; border: 5px solid rgba(255,215,0,0.1); border-top-color: #FFD700; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; z-index: 150; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-#toast {
-    position: absolute;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(184,134,11,0.95);
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: 30px;
-    font-weight: bold;
-    display: none;
-    z-index: 200;
-}
+#toast { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(184,134,11,0.95); color: #fff; padding: 10px 22px; border-radius: 30px; font-weight: bold; display: none; z-index: 200; }
 </style>
 </head>
 <body>
 
 <div id="player-root">
     <div id="wrap">
-        <video id="video" playsinline></video>
+        <!-- أضفنا muted للتشغيل التلقائي المضمون -->
+        <video id="video" playsinline muted></video>
         <div id="loader"></div>
 
         <div class="ui-layer" id="ui">
             <div class="top-bar">
-                <div style="display: flex; align-items: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <button class="btn-icon" onclick="history.back()"><i data-feather="arrow-right"></i></button>
+                    <!-- تم تغيير الاسم هنا -->
+                    <span style="color:#FFD700; font-weight:800; font-size: 18px; letter-spacing: 1px;">BERYAN.TV</span>
                 </div>
             </div>
 
@@ -185,12 +62,12 @@ video {
                 <div class="bottom-row">
                     <div id="timeLabel" style="color:#FFD700; font-size:13px; font-weight:bold;">00:00 / 00:00</div>
                     <div class="icons-group">
-                        <button class="btn-icon" id="rotateBtn"><i data-feather="refresh-cw"></i></button>
-                        <button class="btn-icon" id="fullBtn"><i data-feather="maximize"></i></button>
-                        <button class="btn-icon" id="fitBtn"><i data-feather="maximize-2"></i></button>
+                        <button class="btn-icon" id="rotateBtn" title="تدوير"><i data-feather="refresh-cw"></i></button>
+                        <button class="btn-icon" id="fullBtn" title="ملء الشاشة"><i data-feather="maximize"></i></button>
+                        <button class="btn-icon" id="fitBtn" title="وضع العرض"><i data-feather="maximize-2"></i></button>
                         <button class="btn-icon" onclick="showToast('الجودة تلقائية')"><i data-feather="settings"></i></button>
                         <button class="btn-icon" onclick="showToast('لا توجد ترجمة')"><i data-feather="message-square"></i></button>
-                        <button class="btn-icon" id="muteBtn"><i data-feather="volume-2"></i></button>
+                        <button class="btn-icon" id="muteBtn" title="الصوت"><i data-feather="volume-x"></i></button>
                     </div>
                 </div>
             </div>
@@ -206,14 +83,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const wrap = document.getElementById("wrap");
     const ui = document.getElementById("ui");
     const playBtn = document.getElementById("playBtn");
-    const rotateBtn = document.getElementById("rotateBtn");
     const muteBtn = document.getElementById("muteBtn");
+    
+    // تشغيل تلقائي بمجرد التحميل
+    const startAutoplay = () => {
+        video.play().then(() => {
+            showToast("جاري التشغيل التلقائي...");
+        }).catch(err => {
+            console.log("Autoplay blocked, waiting for user");
+            ui.classList.add("visible");
+        });
+    };
+
+    // منطق التحميل
+    const url = new URLSearchParams(window.location.search).get("url");
+    if(url) {
+        if(url.includes(".m3u8") && Hls.isSupported()) {
+            const hls = new Hls(); 
+            hls.loadSource(url); 
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, startAutoplay);
+        } else { 
+            video.src = url;
+            video.oncanplay = startAutoplay;
+        }
+    }
+
+    // زر كتم/تشغيل الصوت وتحديث الأيقونة
+    muteBtn.onclick = (e) => {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        muteBtn.innerHTML = `<i data-feather="${video.muted ? 'volume-x' : 'volume-2'}"></i>`;
+        feather.replace();
+        showToast(video.muted ? "الصوت مكتوم" : "تم تشغيل الصوت");
+    };
+
+    // باقي الوظائف (التدوير، شريط التقدم، إلخ)
+    const rotateBtn = document.getElementById("rotateBtn");
     const fitBtn = document.getElementById("fitBtn");
     const fullBtn = document.getElementById("fullBtn");
     const loader = document.getElementById("loader");
-
     let isRotated = false;
-    let uiTimer;
     let fitIndex = 0;
 
     rotateBtn.onclick = (e) => {
@@ -228,39 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const modes = ["fill", "contain", "cover"];
         fitIndex = (fitIndex + 1) % modes.length;
         video.style.objectFit = modes[fitIndex];
-        showToast("وضع العرض المختار");
-    };
-
-    function showControls() {
-        ui.classList.add("visible");
-        clearTimeout(uiTimer);
-        uiTimer = setTimeout(() => { if(!video.paused) ui.classList.remove("visible"); }, 3000);
-    }
-
-    function showToast(m) {
-        const t = document.getElementById("toast");
-        t.innerText = m; t.style.display="block";
-        setTimeout(()=> t.style.display="none", 2000);
-    }
-
-    wrap.onclick = showControls;
-
-    playBtn.onclick = (e) => {
-        e.stopPropagation();
-        if(video.paused) video.play(); else video.pause();
-    };
-
-    muteBtn.onclick = (e) => {
-        e.stopPropagation();
-        video.muted = !video.muted;
-        muteBtn.innerHTML = `<i data-feather="${video.muted ? 'volume-x' : 'volume-2'}"></i>`;
-        feather.replace();
+        showToast("العرض: " + modes[fitIndex]);
     };
 
     fullBtn.onclick = (e) => {
         e.stopPropagation();
         if (!document.fullscreenElement) wrap.requestFullscreen();
         else document.exitFullscreen();
+    };
+
+    playBtn.onclick = (e) => {
+        e.stopPropagation();
+        if(video.paused) video.play(); else video.pause();
     };
 
     video.onplay = () => { playBtn.innerHTML = '<i data-feather="pause"></i>'; feather.replace(); };
@@ -275,13 +164,19 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("timeLabel").textContent = `${fmt(video.currentTime)} / ${fmt(video.duration || 0)}`;
     };
 
-    const url = new URLSearchParams(window.location.search).get("url");
-    if(url) {
-        if(url.includes(".m3u8") && Hls.isSupported()) {
-            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
-        } else { video.src = url; }
-        video.play().catch(() => ui.classList.add("visible"));
+    function showToast(m) {
+        const t = document.getElementById("toast");
+        t.innerText = m; t.style.display="block";
+        setTimeout(()=> t.style.display="none", 2000);
     }
+
+    let uiTimer;
+    function showControls() {
+        ui.classList.add("visible");
+        clearTimeout(uiTimer);
+        uiTimer = setTimeout(() => { if(!video.paused) ui.classList.remove("visible"); }, 3000);
+    }
+    wrap.onclick = showControls;
 });
 </script>
 </body>
