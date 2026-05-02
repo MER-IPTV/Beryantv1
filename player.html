@@ -136,7 +136,6 @@ video.fit-fill{object-fit:fill!important}
 </div>
 
 <script>
-/* الكود البرمجي بالكامل كما هو دون أي حذف */
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("gesturestart", e => e.preventDefault());
   feather.replace();
@@ -212,7 +211,30 @@ document.addEventListener("DOMContentLoaded", () => {
   $("fwd").onclick=e=>{e.stopPropagation();video.currentTime+=15;showControls()};
   muteBtn.onclick=e=>{e.stopPropagation();video.muted=!video.muted;setMuteIcon();showControls()};
   fitBtn.onclick=e=>{e.stopPropagation();const modes=["fit-contain","fit-cover","fit-fill"];video.classList.remove(...modes);fitIndex=(fitIndex+1)%modes.length;video.classList.add(modes[fitIndex]);showControls()};
-  progress.onclick=e=>{const r=progress.getBoundingClientRect(),x=(e.clientX-r.left)/r.width;video.currentTime=x*video.duration;showControls()};
+  
+  // تفعيل زر تكبير الشاشة (Full Screen)
+  fullBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            flash("لا يمكن تفعيل ملء الشاشة");
+        });
+        fullBtn.innerHTML = `<i data-feather="minimize"></i>`;
+    } else {
+        document.exitFullscreen();
+        fullBtn.innerHTML = `<i data-feather="maximize"></i>`;
+    }
+    feather.replace();
+    showControls();
+  };
+
+  progress.onclick=e=>{
+    const r=progress.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width;
+    video.currentTime=x*video.duration;
+    showControls();
+  };
+
   tapStart.onclick=async()=>{startVideoAfterLoad()};
   $("back").onclick=()=>history.back();
   video.addEventListener("waiting",()=>buffer.style.display="block");
