@@ -80,7 +80,7 @@ video.fit-fill{object-fit:fill!important}
 
 <div class="server-bar" id="serverBar"></div>
 <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" autoplay></video>
-<div id="tapStart">اضغط على الشاشة للتشغيل بملء الشاشة</div>
+<div id="tapStart">اضغط لبدء المشاهدة بوضع العرض</div>
 
 <div class="top" id="top"><button class="btn" id="back" title="رجوع"><i data-feather="arrow-right"></i></button><div class="title" id="title">BSR Player</div></div>
 <div id="loading"></div><div id="buffer"></div>
@@ -100,7 +100,7 @@ video.fit-fill{object-fit:fill!important}
     <div class="live" id="live"><span></span>LIVE</div>
     <div class="icons">
       <button class="icon" id="fullBtn" title="ملء الشاشة"><i data-feather="maximize"></i></button>
-      <button class="icon" id="rotBtn" title="تدوير الشاشة"><i data-feather="refresh-cw"></i></button>
+      <button class="icon" id="rotBtn" title="تدوير"><i data-feather="refresh-cw"></i></button>
       <button class="icon" id="pipBtn" title="نافذة صغيرة"><i data-feather="airplay"></i></button>
       <button class="icon" id="castBtn" title="Cast"><i data-feather="cast"></i></button>
       <button class="icon" id="quality" title="الجودة"><i data-feather="settings"></i></button>
@@ -147,15 +147,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function forceMobileFullscreen(){
     try{ window.scrollTo(0,1); }catch{}
-    try{ document.documentElement.requestFullscreen && !document.fullscreenElement && await document.documentElement.requestFullscreen({navigationUI:"hide"}); }catch{}
-    try{ wrap.requestFullscreen && !document.fullscreenElement && await wrap.requestFullscreen({navigationUI:"hide"}); }catch{}
-    try{ if(screen.orientation?.lock) await screen.orientation.lock("landscape").catch(()=>{}); }catch{}
+    try{
+      if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen({navigationUI:"hide"});
+      else if (wrap.requestFullscreen) await wrap.requestFullscreen({navigationUI:"hide"});
+    }catch{}
+    // قفل اتجاه الشاشة على وضع العرض Landscape
+    try{ if(screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape").catch(()=>{}); }catch{}
     try{
       const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if(isiOS && video.webkitEnterFullscreen && !document.fullscreenElement) video.webkitEnterFullscreen();
+      if(isiOS && video.webkitEnterFullscreen) video.webkitEnterFullscreen();
     }catch{}
     try{ if(navigator.wakeLock) await navigator.wakeLock.request("screen").catch(()=>{}); }catch{}
   }
+
   function hideControls(){topBar.classList.remove("visible");bottom.classList.remove("visible");center.classList.remove("visible");serverBar.classList.add("hide");qMenu.classList.remove("visible")}
   function showControls(){topBar.classList.add("visible");bottom.classList.add("visible");center.classList.add("visible");serverBar.classList.remove("hide");clearTimeout(hideTimer);hideTimer=setTimeout(hideControls,2500)}
   function flash(t){toast.textContent=t;toast.style.display="block";setTimeout(()=>toast.style.display="none",1300)}
@@ -163,8 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function setMuteIcon(){muteBtn.innerHTML=`<i data-feather="${video.muted?'volume-x':'volume-2'}"></i>`;feather.replace()}
   const fmt=s=>!isFinite(s)||s<0?"00:00":`${Math.floor(s/60)%60}`.padStart(2,"0")+":"+`${Math.floor(s%60)}`.padStart(2,"0");
   function updateProgress(){const d=video.duration||0,c=video.currentTime||0;if(d>0&&isFinite(d)){const r=(c/d)*100;played.style.width=r+"%";thumb.style.left=r+"%";time.style.display="block";live.style.display="none";time.textContent=`${fmt(c)} • ${fmt(d)}`}else{played.style.width="100%";thumb.style.left="100%";time.style.display="none";live.style.display="flex"}}
+  
   async function startVideoAfterLoad(){
     tapStart.classList.remove("show");
+    // تفعيل وضع العرض Landscape وملء الشاشة تلقائياً عند البدء
+    await forceMobileFullscreen();
     try{ await video.play(); }
     catch{
       try{ video.muted=true; await video.play(); }
@@ -222,25 +229,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (screen.orientation && screen.orientation.lock) {
         const isPortrait = screen.orientation.type.startsWith('portrait');
         await screen.orientation.lock(isPortrait ? "landscape" : "portrait");
-        flash(isPortrait ? "وضع العرض" : "وضع الطول");
-      } else {
-        flash("التدوير غير مدعوم في هذا المتصفح");
       }
-    } catch(err) {
-      flash("يرجى تفعيل ملء الشاشة أولاً");
-    }
+    } catch(err) {}
     showControls();
   };
   progress.onclick=e=>{const d=video.duration||0;if(!(d>0&&isFinite(d)))return;const r=progress.getBoundingClientRect(),x=(e.clientX-r.left)/r.width;video.currentTime=Math.max(0,Math.min(d,x*d));showControls()};
   $("retry").onclick=playStream;
-  tapStart.onclick=async e=>{e.stopPropagation(); await forceMobileFullscreen(); await startVideoAfterLoad();};
+  tapStart.onclick=async e=>{e.stopPropagation(); await startVideoAfterLoad();};
   $("back").onclick=e=>{e.stopPropagation();history.back()};
   video.addEventListener("waiting",()=>buffer.style.display="block");video.addEventListener("playing",()=>buffer.style.display="none");video.addEventListener("timeupdate",updateProgress);video.addEventListener("loadedmetadata",updateProgress);video.addEventListener("play",setPlayIcon);video.addEventListener("pause",setPlayIcon);
   wrap.onclick=async()=>{
     showControls();
     if(video.paused || tapStart.classList.contains("show")){
-      await video.play().catch(async()=>{video.muted=true;await video.play().catch(()=>{})});
-      setPlayIcon(); setMuteIcon(); tapStart.classList.remove("show");
+      await startVideoAfterLoad();
     }
   };
   setMuteIcon();setPlayIcon();showControls();buildServerButtons();playStream();setTimeout(hideControls,3200);
