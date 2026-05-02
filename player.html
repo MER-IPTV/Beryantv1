@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<title>BSR Player Mobile</title>
+<title>BSR Player Mobile - Golden Edition</title>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -23,6 +23,7 @@ video.fit-contain{object-fit:contain!important}
 video.fit-cover{object-fit:cover!important}
 video.fit-fill{object-fit:fill!important}
 
+/* التنسيق الذهبي للسيرفرات */
 .server-bar{
   position:absolute;top:16px;left:12px;right:auto;z-index:130;display:none;gap:8px;
   padding:6px;max-width:min(72vw,760px);overflow-x:auto;direction:ltr;
@@ -32,41 +33,50 @@ video.fit-fill{object-fit:fill!important}
 .server-bar::-webkit-scrollbar{display:none}
 .server-bar.visible{display:flex;opacity:1}
 .server-bar.hide{opacity:0;pointer-events:none}
-.server-btn{flex:0 0 auto;border:1px solid rgba(255,255,255,.30);background:transparent;color:#fff;padding:8px 14px;border-radius:999px;font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer;white-space:nowrap;text-shadow:0 1px 2px #000}
-.server-btn.active{background:#fff;color:#000}
+.server-btn{flex:0 0 auto;border:1px solid rgba(255,215,0,0.4);background:transparent;color:#FFD700;padding:8px 14px;border-radius:999px;font-family:Tajawal,sans-serif;font-weight:800;cursor:pointer;white-space:nowrap;text-shadow:0 1px 2px #000}
+.server-btn.active{background:#FFD700;color:#000}
 
-#loading,#buffer{position:absolute;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin 1s linear infinite;display:none}
+/* لون التحميل الذهبي */
+#loading,#buffer{position:absolute;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:5px solid rgba(255,215,0,0.2);border-top-color:#FFD700;animation:spin 1s linear infinite;display:none}
 #loading{width:52px;height:52px}#buffer{width:86px;height:86px}@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
 #error{position:absolute;inset:0;z-index:999;background:rgba(0,0,0,.94);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-#error button{border:0;background:#fff;color:#000;border-radius:999px;padding:11px 18px;font-weight:800;font-family:Tajawal}
+#error button{border:0;background:#FFD700;color:#000;border-radius:999px;padding:11px 18px;font-weight:800;font-family:Tajawal}
 
 .top{position:absolute;top:0;right:0;left:auto;z-index:80;padding:14px 16px;background:transparent;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;opacity:0;transition:.25s;pointer-events:none}
 .top.visible,.bottom.visible,.center.visible{opacity:1;pointer-events:auto}
-.title{color:#fff;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw;text-align:right;text-shadow:0 1px 2px #000}
-.btn,.icon{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-shadow:0 1px 2px #000}
+.title{color:#FFD700;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw;text-align:right;text-shadow:0 1px 2px #000}
+
+/* أزرار التحكم الذهبية */
+.btn,.icon{border:1px solid rgba(255,215,0,0.3);background:transparent;color:#FFD700;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-shadow:0 1px 2px #000}
 .btn{width:42px;height:42px}.icon{width:42px;height:42px}
 
 .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:20px;align-items:center;opacity:0;transition:.25s;z-index:80;pointer-events:none}
 .center.visible{pointer-events:auto}
-.circle{border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px #000}
-.big{width:76px;height:76px}.seek{width:58px;height:58px;position:relative}.seek .num{position:absolute;font-size:13px;font-weight:900}
+.circle{border:1px solid rgba(255,215,0,0.4);background:transparent;color:#FFD700;border-radius:999px;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px #000}
+.big{width:76px;height:76px;border-width:2px;box-shadow:0 0 15px rgba(255,215,0,0.2)}.seek{width:58px;height:58px;position:relative}.seek .num{position:absolute;font-size:13px;font-weight:900}
 
 .bottom{position:absolute;left:0;right:0;bottom:0;z-index:80;padding:12px 14px 15px;background:transparent;opacity:0;transition:.25s;pointer-events:none}
 .bottom.visible{pointer-events:auto}
-.progress{height:5px;background:rgba(255,255,255,.25);border-radius:999px;position:relative;margin-bottom:12px;overflow:hidden}
-.played{position:absolute;left:0;top:0;bottom:0;width:0;background:#fff}.thumb{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#fff}
+
+/* شريط التقدم الذهبي */
+.progress{height:5px;background:rgba(255,215,0,0.15);border-radius:999px;position:relative;margin-bottom:12px;overflow:hidden}
+.played{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg, #b8860b, #FFD700)}.thumb{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#FFD700;box-shadow:0 0 8px #FFD700}
+
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;direction:ltr;width:100%}
 .icons{display:flex;gap:10px;direction:rtl;justify-content:flex-start;flex:0 1 auto;margin-left:auto;overflow-x:auto;scrollbar-width:none}
 .icons::-webkit-scrollbar{display:none}
-.time{color:#fff;font-size:14px;direction:ltr;min-width:110px;text-align:left;flex:0 0 auto}
+.time{color:#FFD700;font-size:14px;direction:ltr;min-width:110px;text-align:left;flex:0 0 auto}
 .live{display:none;color:#fff;font-weight:900;align-items:center;gap:7px;direction:ltr;flex:0 0 auto}.live span{width:8px;height:8px;background:red;border-radius:50%;box-shadow:0 0 10px red}
-.menu{position:absolute;bottom:76px;right:12px;left:auto;z-index:100;min-width:190px;background:#000;border:1px solid rgba(255,255,255,.16);border-radius:15px;padding:7px;display:none}
-.menu.visible{display:block}.menu button{width:100%;border:0;background:transparent;color:#fff;padding:12px;border-radius:12px;text-align:right;font-family:Tajawal;font-weight:700}.menu button.active,.menu button:hover{background:rgba(255,255,255,.15)}
-#toast{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;padding:8px 14px;border-radius:999px;display:none;z-index:100;font-weight:700}
 
-#tapStart{position:absolute;inset:0;z-index:70;display:none;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;text-align:center;background:#000;padding:20px}
+.menu{position:absolute;bottom:76px;right:12px;left:auto;z-index:100;min-width:190px;background:#000;border:1px solid rgba(255,215,0,0.3);border-radius:15px;padding:7px;display:none}
+.menu.visible{display:block}.menu button{width:100%;border:0;background:transparent;color:#FFD700;padding:12px;border-radius:12px;text-align:right;font-family:Tajawal;font-weight:700}.menu button.active,.menu button:hover{background:rgba(255,215,0,0.15)}
+
+#toast{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);background:rgba(184,134,11,0.8);color:#fff;padding:8px 14px;border-radius:999px;display:none;z-index:100;font-weight:700;border:1px solid #FFD700}
+
+#tapStart{position:absolute;inset:0;z-index:70;display:none;align-items:center;justify-content:center;color:#FFD700;font-weight:900;font-size:18px;text-align:center;background:#000;padding:20px}
 #tapStart.show{display:flex}
+
 @supports(height:100dvh){#player-root,.player-wrapper,video{height:100dvh}}
 @media (display-mode: fullscreen){body{background:#000}}
 @media (max-width:760px){
