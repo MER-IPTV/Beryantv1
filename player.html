@@ -100,7 +100,6 @@ video.fit-fill{object-fit:fill!important}
     <div class="live" id="live"><span></span>LIVE</div>
     <div class="icons">
       <button class="icon" id="fullBtn" title="ملء الشاشة"><i data-feather="maximize"></i></button>
-      <button class="icon" id="rotBtn" title="تدوير"><i data-feather="refresh-cw"></i></button>
       <button class="icon" id="pipBtn" title="نافذة صغيرة"><i data-feather="airplay"></i></button>
       <button class="icon" id="castBtn" title="Cast"><i data-feather="cast"></i></button>
       <button class="icon" id="quality" title="الجودة"><i data-feather="settings"></i></button>
@@ -121,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
   feather.replace();
   const $ = id => document.getElementById(id);
   const video = $("video"), topBar = $("top"), bottom = $("bottom"), center = $("center"), loading = $("loading"), buffer = $("buffer"), errorBox = $("error");
-  const errTitle = $("errTitle"), errMsg = $("errMsg"), titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), qualityBtn = $("quality"), ccBtn = $("ccBtn"), castBtn = $("castBtn"), pipBtn = $("pipBtn"), fullBtn = $("fullBtn"), rotBtn = $("rotBtn"), qMenu = $("qMenu"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), toast = $("toast"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart");
+  const errTitle = $("errTitle"), errMsg = $("errMsg"), titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), qualityBtn = $("quality"), ccBtn = $("ccBtn"), castBtn = $("castBtn"), pipBtn = $("pipBtn"), fullBtn = $("fullBtn"), qMenu = $("qMenu"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), toast = $("toast"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart");
   const WORKER = "https://ali.albesriali8.workers.dev/";
   let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, serverList = [], activeServerIndex = 0;
 
@@ -151,8 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen({navigationUI:"hide"});
       else if (wrap.requestFullscreen) await wrap.requestFullscreen({navigationUI:"hide"});
     }catch{}
-    // قفل اتجاه الشاشة على وضع العرض Landscape
+    
+    // سطر التدوير التلقائي المدمج
     try{ if(screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape").catch(()=>{}); }catch{}
+    
     try{
       const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       if(isiOS && video.webkitEnterFullscreen) video.webkitEnterFullscreen();
@@ -170,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   async function startVideoAfterLoad(){
     tapStart.classList.remove("show");
-    // تفعيل وضع العرض Landscape وملء الشاشة تلقائياً عند البدء
+    // استدعاء ملء الشاشة والتدوير تلقائياً
     await forceMobileFullscreen();
     try{ await video.play(); }
     catch{
@@ -223,16 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
   castBtn.onclick=async e=>{e.stopPropagation();try{if(video.remote&&video.remote.prompt)await video.remote.prompt();else flash("Cast غير مدعوم بهذا المتصفح")}catch{flash("تعذر فتح Cast")}showControls()};
   pipBtn.onclick=async e=>{e.stopPropagation();try{if(document.pictureInPictureElement)await document.exitPictureInPicture();else await video.requestPictureInPicture()}catch{flash("النافذة الصغيرة غير مدعومة")}showControls()};
   fullBtn.onclick=async e=>{e.stopPropagation();await forceMobileFullscreen();showControls()};
-  rotBtn.onclick=async e=>{
-    e.stopPropagation();
-    try {
-      if (screen.orientation && screen.orientation.lock) {
-        const isPortrait = screen.orientation.type.startsWith('portrait');
-        await screen.orientation.lock(isPortrait ? "landscape" : "portrait");
-      }
-    } catch(err) {}
-    showControls();
-  };
   progress.onclick=e=>{const d=video.duration||0;if(!(d>0&&isFinite(d)))return;const r=progress.getBoundingClientRect(),x=(e.clientX-r.left)/r.width;video.currentTime=Math.max(0,Math.min(d,x*d));showControls()};
   $("retry").onclick=playStream;
   tapStart.onclick=async e=>{e.stopPropagation(); await startVideoAfterLoad();};
