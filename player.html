@@ -67,7 +67,7 @@ video.fit-fill{object-fit:fill!important}
 #error{position:absolute;inset:0;z-index:999;background:rgba(0,0,0,.94);color:#A855F7;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
 #error button{border:0;background:#A855F7;color:#fff;border-radius:999px;padding:11px 18px;font-weight:800;font-family:Tajawal}
 
-.top{position:absolute;top:0;right:0;left:auto;z-index:80;padding:14px 16px;background:transparent;display:flex;flex-direction:row;justify(flex-start);align-items:center;gap:10px;opacity:0;transition:.25s;pointer-events:none}
+.top{position:absolute;top:0;right:0;left:auto;z-index:80;padding:14px 16px;background:transparent;display:flex;flex-direction:row;justify-content: flex-start;align-items:center;gap:10px;opacity:0;transition:.25s;pointer-events:none}
 .top.visible,.bottom.visible,.center.visible{opacity:1;pointer-events:auto}
 .title{color:#A855F7;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw;text-align:right;text-shadow:0 1px 2px #000}
 .btn,.icon{border:1px solid rgba(168, 85, 247, 0.3);background:transparent;color:#A855F7;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-shadow:0 1px 2px #000}
@@ -91,7 +91,6 @@ video.fit-fill{object-fit:fill!important}
 .menu.visible{display:block}.menu button{width:100%;border:0;background:transparent;color:#A855F7;padding:12px;border-radius:12px;text-align:right;font-family:Tajawal;font-weight:700}.menu button.active,.menu button:hover{background:rgba(168, 85, 247, 0.15)}
 #toast{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);background:rgba(168, 85, 247, 0.9);color:#fff;padding:8px 14px;border-radius:999px;display:none;z-index:100;font-weight:700}
 
-/* تعديل خلفية الترحيب */
 #tapStart{
     position:absolute;inset:0;z-index:200;display:none;
     flex-direction:column;align-items:center;justify-content:center;
@@ -102,6 +101,15 @@ video.fit-fill{object-fit:fill!important}
 #tapStart.show{display:flex}
 .welcome-msg { font-size: 26px; font-weight: 800; margin-bottom: 10px; color: #A855F7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 .click-msg { font-size: 16px; opacity: 0.8; font-weight: 400; letter-spacing: 1px; }
+
+footer-credit {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 8px;
+    color: rgba(168, 85, 247, 0.4);
+    z-index: 50;
+}
 </style>
 </head>
 <body>
@@ -143,6 +151,7 @@ video.fit-fill{object-fit:fill!important}
   </div>
 </div>
 <div class="menu" id="qMenu"></div><div id="toast"></div>
+<div class="footer-credit">تطوير: علي يعقوب (ROMEO)</div>
 </div>
 </div>
 
@@ -152,7 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
   feather.replace();
   const $ = id => document.getElementById(id);
   const video = $("video"), topBar = $("top"), bottom = $("bottom"), center = $("center"), loading = $("loading"), buffer = $("buffer"), errorBox = $("error");
-  const errTitle = $("errTitle"), errMsg = $("errMsg"), titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), qualityBtn = $("quality"), ccBtn = $("ccBtn"), castBtn = $("castBtn"), pipBtn = $("pipBtn"), fullBtn = $("fullBtn"), qMenu = $("qMenu"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), toast = $("toast"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart");
+  const errTitle = $("errTitle"), errMsg = $("errMsg"), titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), qualityBtn = $("quality"), qMenu = $("qMenu"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), toast = $("toast"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart"), fullBtn = $("fullBtn");
+  
   const WORKER = "https://ali.albesriali8.workers.dev/";
   let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, serverList = [], activeServerIndex = 0;
 
@@ -179,31 +189,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function hideControls(){topBar.classList.remove("visible");bottom.classList.remove("visible");center.classList.remove("visible");serverBar.style.opacity="0";qMenu.classList.remove("visible")}
   function showControls(){topBar.classList.add("visible");bottom.classList.add("visible");center.classList.add("visible");serverBar.style.opacity="1";clearTimeout(hideTimer);hideTimer=setTimeout(hideControls,3000)}
-  function flash(t){toast.textContent=t;toast.style.display="block";setTimeout(()=>toast.style.display="none",1300)}
   function setPlayIcon(){playBtn.innerHTML=`<i data-feather="${video.paused?'play':'pause'}"></i>`;feather.replace()}
   function setMuteIcon(){muteBtn.innerHTML=`<i data-feather="${video.muted?'volume-x':'volume-2'}"></i>`;feather.replace()}
   const fmt=s=>!isFinite(s)||s<0?"00:00":`${Math.floor(s/60)%60}`.padStart(2,"0")+":"+`${Math.floor(s%60)}`.padStart(2,"0");
-  function updateProgress(){const d=video.duration||0,c=video.currentTime||0;if(d>0&&isFinite(d)){const r=(c/d)*100;played.style.width=r+"%";thumb.style.left=r+"%";time.style.display="block";live.style.display="none";time.textContent=`${fmt(c)} • ${fmt(d)}`}else{played.style.width="100%";thumb.style.left="100%";time.style.display="none";live.style.display="flex"}}
+  
+  function updateProgress(){
+    const d=video.duration||0,c=video.currentTime||0;
+    if(d>0&&isFinite(d)){
+      const r=(c/d)*100;played.style.width=r+"%";thumb.style.left=r+"%";time.style.display="block";live.style.display="none";time.textContent=`${fmt(c)} • ${fmt(d)}`;
+    }else{
+      played.style.width="100%";thumb.style.left="100%";time.style.display="none";live.style.display="flex";
+    }
+  }
   
   async function triggerFullscreen() {
     try {
-        if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-            await document.documentElement.webkitRequestFullscreen();
-        }
-    } catch (e) { console.log("Fullscreen blocked or failed"); }
+        if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else if (document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen();
+    } catch (e) {}
   }
 
   async function startVideoAfterLoad(){
     tapStart.classList.remove("show");
     await triggerFullscreen(); 
-    try{ await video.play(); }
-    catch{ tapStart.classList.add("show"); }
+    try{ await video.play(); } catch{ tapStart.classList.add("show"); }
     setPlayIcon(); setMuteIcon(); showControls();
   }
 
-  async function destroyPlayers(){if(hls){hls.destroy();hls=null}if(shakaPlayer){await shakaPlayer.destroy().catch(()=>{});shakaPlayer=null}video.removeAttribute("src");video.load()}
+  async function destroyPlayers(){
+    if(hls){hls.destroy();hls=null}
+    if(shakaPlayer){await shakaPlayer.destroy().catch(()=>{});shakaPlayer=null}
+    video.removeAttribute("src");video.load();
+  }
 
   async function playStream(){
     const p=getParams(); if(!p.url){errTitle.textContent="لا يوجد رابط";errMsg.textContent="الرابط غير صالح";errorBox.style.display="flex";return}
@@ -221,8 +238,20 @@ document.addEventListener("DOMContentLoaded", () => {
         await shakaPlayer.load(src); loading.style.display="none"; await startVideoAfterLoad();
       }else{
         if(Hls.isSupported()){
-          hls=new Hls(); hls.loadSource(src); hls.attachMedia(video);
+          // تحسينات السرعة لروابط m3u8
+          hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 60,
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            startLevel: -1,
+            testBandwidth: true
+          });
+          hls.loadSource(src);
+          hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED,async()=>{loading.style.display="none";await startVideoAfterLoad()});
+          hls.on(Hls.Events.ERROR, (event, data) => { if(data.fatal) { switch(data.type){ case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break; case Hls.ErrorTypes.MEDIA_ERROR: hls.recoverMediaError(); break; default: destroyPlayers(); break; } } });
         }else{video.src=src;video.load();loading.style.display="none";await startVideoAfterLoad()}
       }
     }catch(e){errorBox.style.display="flex"}
@@ -240,11 +269,10 @@ document.addEventListener("DOMContentLoaded", () => {
         await triggerFullscreen();
         fullBtn.innerHTML = `<i data-feather="minimize"></i>`;
     } else {
-        document.exitFullscreen();
+        if(document.exitFullscreen) document.exitFullscreen();
         fullBtn.innerHTML = `<i data-feather="maximize"></i>`;
     }
-    feather.replace();
-    showControls();
+    feather.replace(); showControls();
   };
 
   progress.onclick=e=>{
@@ -260,6 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
   video.addEventListener("playing",()=>buffer.style.display="none");
   video.addEventListener("timeupdate",updateProgress);
   wrap.onclick=showControls;
+  $("retry").onclick=()=>playStream();
   buildServerButtons();playStream();
 });
 </script>
