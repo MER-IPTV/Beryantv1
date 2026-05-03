@@ -65,30 +65,31 @@ video.fit-fill{object-fit:fill!important}
 #loading{width:52px;height:52px}#buffer{width:86px;height:86px}@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
 #error{position:absolute;inset:0;z-index:999;background:rgba(0,0,0,.94);color:#A855F7;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-#error button{border:0;background:#A855F7;color:#fff;border-radius:999px;padding:11px 18px;font-weight:800;font-family:Tajawal;margin-top:10px}
+#error button{border:0;background:#A855F7;color:#fff;border-radius:999px;padding:11px 18px;font-weight:800;font-family:Tajawal}
 
-.top{position:absolute;top:0;right:0;left:auto;z-index:80;padding:14px 16px;background:linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);display:flex;flex-direction:row;justify-content: flex-start;align-items:center;gap:10px;opacity:0;transition:.25s;pointer-events:none;width:100%}
+.top{position:absolute;top:0;right:0;left:auto;z-index:80;padding:14px 16px;background:transparent;display:flex;flex-direction:row;justify-content: flex-start;align-items:center;gap:10px;opacity:0;transition:.25s;pointer-events:none}
 .top.visible,.bottom.visible,.center.visible{opacity:1;pointer-events:auto}
 .title{color:#A855F7;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw;text-align:right;text-shadow:0 1px 2px #000}
-.btn,.icon{border:1px solid rgba(168, 85, 247, 0.3);background:rgba(0,0,0,0.3);color:#A855F7;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-shadow:0 1px 2px #000}
+.btn,.icon{border:1px solid rgba(168, 85, 247, 0.3);background:transparent;color:#A855F7;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-shadow:0 1px 2px #000}
 .btn{width:42px;height:42px}.icon{width:42px;height:42px}
 
 .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:20px;align-items:center;opacity:0;transition:.25s;z-index:80;pointer-events:none}
 .center.visible{pointer-events:auto}
-.circle{border:1px solid rgba(168, 85, 247, 0.3);background:rgba(0,0,0,0.2);color:#A855F7;border-radius:999px;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px #000}
+.circle{border:1px solid rgba(168, 85, 247, 0.3);background:transparent;color:#A855F7;border-radius:999px;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 2px #000}
 .big{width:76px;height:76px}.seek{width:58px;height:58px;position:relative}.seek .num{position:absolute;font-size:13px;font-weight:900}
 
-.bottom{position:absolute;left:0;right:0;bottom:0;z-index:80;padding:12px 14px 15px;background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);opacity:0;transition:.25s;pointer-events:none}
+.bottom{position:absolute;left:0;right:0;bottom:0;z-index:80;padding:12px 14px 15px;background:transparent;opacity:0;transition:.25s;pointer-events:none}
 .bottom.visible{pointer-events:auto}
-.progress{height:5px;background:rgba(168, 85, 247, 0.2);border-radius:999px;position:relative;margin-bottom:12px;overflow:hidden;cursor:pointer}
+.progress{height:5px;background:rgba(168, 85, 247, 0.2);border-radius:999px;position:relative;margin-bottom:12px;overflow:hidden}
 .played{position:absolute;left:0;top:0;bottom:0;width:0;background:#A855F7}.thumb{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:#A855F7}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px;direction:ltr;width:100%}
 .icons{display:flex;gap:10px;direction:rtl;justify-content:flex-start;flex:0 1 auto;margin-left:auto;overflow-x:auto;scrollbar-width:none}
 .icons::-webkit-scrollbar{display:none}
 .time{color:#A855F7;font-size:14px;direction:ltr;min-width:110px;text-align:left;flex:0 0 auto}
-.live{display:none;color:#A855F7;font-weight:900;align-items:center;gap:7px;direction:ltr;flex:0 0 auto}.live span{width:8px;height:8px;background:#ff00ea;border-radius:50%;box-shadow:0 0 10px #ff00ea;animation:pulse 1.5s infinite}
-
-@keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
+.live{display:none;color:#A855F7;font-weight:900;align-items:center;gap:7px;direction:ltr;flex:0 0 auto}.live span{width:8px;height:8px;background:#ff00ea;border-radius:50%;box-shadow:0 0 10px #ff00ea}
+.menu{position:absolute;bottom:76px;right:12px;left:auto;z-index:100;min-width:190px;background:#000;border:1px solid rgba(168, 85, 247, 0.3);border-radius:15px;padding:7px;display:none}
+.menu.visible{display:block}.menu button{width:100%;border:0;background:transparent;color:#A855F7;padding:12px;border-radius:12px;text-align:right;font-family:Tajawal;font-weight:700}.menu button.active,.menu button:hover{background:rgba(168, 85, 247, 0.15)}
+#toast{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);background:rgba(168, 85, 247, 0.9);color:#fff;padding:8px 14px;border-radius:999px;display:none;z-index:100;font-weight:700}
 
 #tapStart{
     position:absolute;inset:0;z-index:200;display:none;
@@ -101,14 +102,13 @@ video.fit-fill{object-fit:fill!important}
 .welcome-msg { font-size: 26px; font-weight: 800; margin-bottom: 10px; color: #A855F7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 .click-msg { font-size: 16px; opacity: 0.8; font-weight: 400; letter-spacing: 1px; }
 
-.footer-credit {
+footer-credit {
     position: absolute;
     bottom: 5px;
     left: 5px;
-    font-size: 9px;
-    color: rgba(168, 85, 247, 0.5);
+    font-size: 8px;
+    color: rgba(168, 85, 247, 0.4);
     z-index: 50;
-    pointer-events: none;
 }
 </style>
 </head>
@@ -123,24 +123,15 @@ video.fit-fill{object-fit:fill!important}
     <div class="click-msg">اضغط لبدء البث المباشر</div>
 </div>
 
-<div class="top" id="top">
-    <button class="btn" id="back" title="رجوع"><i data-feather="arrow-right"></i></button>
-    <div class="title" id="title">Beryan Player</div>
-</div>
-
+<div class="top" id="top"><button class="btn" id="back" title="رجوع"><i data-feather="arrow-right"></i></button><div class="title" id="title">Beryan Player</div></div>
 <div id="loading"></div><div id="buffer"></div>
 
-<div id="error">
-    <i data-feather="alert-triangle" style="width:48px;height:48px;margin-bottom:10px"></i>
-    <h3 id="errTitle">خطأ في المشغل</h3>
-    <p id="errMsg">تعذر تشغيل الرابط</p>
-    <button id="retry">إعادة التحميل</button>
-</div>
+<div id="error"><i data-feather="alert-triangle"></i><h3 id="errTitle">خطأ في المشغل</h3><p id="errMsg">تعذر تشغيل الرابط</p><button id="retry">إعادة التحميل</button></div>
 
 <div class="center" id="center">
-  <button class="circle seek" id="rew"><i data-feather="rotate-ccw"></i><div class="num">10</div></button>
+  <button class="circle seek" id="rew"><i data-feather="rotate-ccw"></i><div class="num">5</div></button>
   <button class="circle big" id="play"><i data-feather="pause"></i></button>
-  <button class="circle seek" id="fwd"><i data-feather="rotate-cw"></i><div class="num">10</div></button>
+  <button class="circle seek" id="fwd"><i data-feather="rotate-cw"></i><div class="num">15</div></button>
 </div>
 
 <div class="bottom" id="bottom">
@@ -150,11 +141,16 @@ video.fit-fill{object-fit:fill!important}
     <div class="live" id="live"><span></span>LIVE</div>
     <div class="icons">
       <button class="icon" id="fullBtn" title="ملء الشاشة"><i data-feather="maximize"></i></button>
+      <button class="icon" id="pipBtn" title="نافذة صغيرة"><i data-feather="airplay"></i></button>
+      <button class="icon" id="castBtn" title="Cast"><i data-feather="cast"></i></button>
+      <button class="icon" id="quality" title="الجودة"><i data-feather="settings"></i></button>
+      <button class="icon" id="ccBtn" title="الترجمة"><i data-feather="message-square"></i></button>
+      <button class="icon" id="mute" title="الصوت"><i data-feather="volume-x"></i></button>
       <button class="icon" id="fit" title="تغيير العرض"><i data-feather="maximize-2"></i></button>
-      <button class="icon" id="mute" title="الصوت"><i data-feather="volume-2"></i></button>
     </div>
   </div>
 </div>
+<div class="menu" id="qMenu"></div><div id="toast"></div>
 <div class="footer-credit">تطوير: علي يعقوب (ROMEO)</div>
 </div>
 </div>
@@ -163,144 +159,137 @@ video.fit-fill{object-fit:fill!important}
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("gesturestart", e => e.preventDefault());
   feather.replace();
-  
   const $ = id => document.getElementById(id);
   const video = $("video"), topBar = $("top"), bottom = $("bottom"), center = $("center"), loading = $("loading"), buffer = $("buffer"), errorBox = $("error");
-  const titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart"), fullBtn = $("fullBtn");
+  const errTitle = $("errTitle"), errMsg = $("errMsg"), titleEl = $("title"), playBtn = $("play"), muteBtn = $("mute"), fitBtn = $("fit"), qualityBtn = $("quality"), qMenu = $("qMenu"), progress = $("progress"), played = $("played"), thumb = $("thumb"), time = $("time"), live = $("live"), toast = $("toast"), serverBar = $("serverBar"), wrap = $("wrap"), tapStart = $("tapStart"), fullBtn = $("fullBtn");
   
   const WORKER = "https://ali.albesriali8.workers.dev/";
-  let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, activeServerIndex = 0;
+  let hls = null, shakaPlayer = null, hideTimer = null, fitIndex = 0, serverList = [], activeServerIndex = 0;
 
   const getP = () => new URLSearchParams(location.search);
   const get = k => { let v = getP().get(k)||""; try{v=decodeURIComponent(v)}catch{} return v; };
+  function decodeServersParam(){let raw=get("servers"); if(!raw)return null; try{return JSON.parse(decodeURIComponent(escape(atob(raw))))}catch{return null}}
 
-  function decodeServersParam(){
-    let raw = get("servers"); 
-    if(!raw) return null; 
-    try { return JSON.parse(decodeURIComponent(escape(atob(raw)))) } catch { return null }
+  function buildServerButtons(){
+    const data=decodeServersParam(); if(!data||!Array.isArray(data.servers)||!data.servers.length)return;
+    serverList=data.servers;
+    serverBar.innerHTML=serverList.map((s,i)=>`<button class="server-btn ${i===0?'active':''}" data-index="${i}">${s.name||'Server '+(i+1)}</button>`).join("");
+    serverBar.classList.add("visible");
+    serverBar.querySelectorAll(".server-btn").forEach(btn=>{
+      btn.onclick=async e=>{e.stopPropagation();activeServerIndex=+btn.dataset.index;serverBar.querySelectorAll(".server-btn").forEach(x=>x.classList.remove("active"));btn.classList.add("active");await playStream();showControls();};
+    });
   }
 
-  function getParams(){
-    const s = decodeServersParam(); 
-    if(s?.servers?.[activeServerIndex]) return s.servers[activeServerIndex]; 
-    return {url:get("url"), title:get("title")||"Beryan Player", ck:get("ck"), ref:get("ref"), ua:get("ua")||navigator.userAgent};
-  }
+  function getParams(){const s=decodeServersParam(); if(s?.servers?.[activeServerIndex])return s.servers[activeServerIndex]; return {url:get("url"),title:get("title")||"Beryan Player",ck:get("ck"),ref:get("ref"),ua:get("ua")||navigator.userAgent};}
+  const isMpd=u=>(u||"").toLowerCase().includes(".mpd");
+  const isMp4=u=>(u||"").toLowerCase().includes(".mp4");
+  const isHls=u=>{u=(u||"").toLowerCase();return u.includes(".m3u8")||u.includes(".png")||u.includes("#hls")||u.includes(".json")};
+  const proxyUrl=(u,ref,ua)=>{const p=new URLSearchParams();p.set("url",u.replace("#hls",""));p.set("ua",ua||navigator.userAgent);try{const x=new URL(u.replace("#hls",""));p.set("ref",ref||x.origin+"/")}catch{}return WORKER+"?"+p.toString()};
+  const finalUrl=p=>(isMpd(p.url)||isMp4(p.url)?p.url:proxyUrl(p.url,p.ref,p.ua));
 
-  const isMpd = u => (u||"").toLowerCase().includes(".mpd");
-  const isMp4 = u => (u||"").toLowerCase().includes(".mp4");
-  const proxyUrl = (u,ref,ua) => {
-    const p = new URLSearchParams();
-    p.set("url", u.replace("#hls",""));
-    p.set("ua", ua || navigator.userAgent);
-    try { const x = new URL(u.replace("#hls","")); p.set("ref", ref || x.origin + "/") } catch{}
-    return WORKER + "?" + p.toString();
-  };
-  const finalUrl = p => (isMpd(p.url) || isMp4(p.url) ? p.url : proxyUrl(p.url, p.ref, p.ua));
-
-  function hideControls(){
-    topBar.classList.remove("visible"); 
-    bottom.classList.remove("visible"); 
-    center.classList.remove("visible"); 
-    serverBar.style.opacity="0";
-  }
-  
-  function showControls(){
-    topBar.classList.add("visible"); 
-    bottom.classList.add("visible"); 
-    center.classList.add("visible"); 
-    serverBar.style.opacity="1";
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(hideControls, 4000);
-  }
-
-  function setPlayIcon(){ playBtn.innerHTML = `<i data-feather="${video.paused?'play':'pause'}"></i>`; feather.replace(); }
-  function setMuteIcon(){ muteBtn.innerHTML = `<i data-feather="${video.muted?'volume-x':'volume-2'}"></i>`; feather.replace(); }
-  const fmt = s => !isFinite(s)||s<0 ? "00:00" : `${Math.floor(s/60)%60}`.padStart(2,"0")+":"+`${Math.floor(s%60)}`.padStart(2,"0");
+  function hideControls(){topBar.classList.remove("visible");bottom.classList.remove("visible");center.classList.remove("visible");serverBar.style.opacity="0";qMenu.classList.remove("visible")}
+  function showControls(){topBar.classList.add("visible");bottom.classList.add("visible");center.classList.add("visible");serverBar.style.opacity="1";clearTimeout(hideTimer);hideTimer=setTimeout(hideControls,3000)}
+  function setPlayIcon(){playBtn.innerHTML=`<i data-feather="${video.paused?'play':'pause'}"></i>`;feather.replace()}
+  function setMuteIcon(){muteBtn.innerHTML=`<i data-feather="${video.muted?'volume-x':'volume-2'}"></i>`;feather.replace()}
+  const fmt=s=>!isFinite(s)||s<0?"00:00":`${Math.floor(s/60)%60}`.padStart(2,"0")+":"+`${Math.floor(s%60)}`.padStart(2,"0");
   
   function updateProgress(){
-    const d=video.duration||0, c=video.currentTime||0;
-    if(d>0 && isFinite(d)){
-      const r=(c/d)*100; played.style.width=r+"%"; thumb.style.left=r+"%"; time.style.display="block"; live.style.display="none"; time.textContent=`${fmt(c)} • ${fmt(d)}`;
+    const d=video.duration||0,c=video.currentTime||0;
+    if(d>0&&isFinite(d)){
+      const r=(c/d)*100;played.style.width=r+"%";thumb.style.left=r+"%";time.style.display="block";live.style.display="none";time.textContent=`${fmt(c)} • ${fmt(d)}`;
     }else{
-      played.style.width="100%"; thumb.style.left="100%"; time.style.display="none"; live.style.display="flex";
+      played.style.width="100%";thumb.style.left="100%";time.style.display="none";live.style.display="flex";
     }
+  }
+  
+  async function triggerFullscreen() {
+    try {
+        if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        else if (document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen();
+    } catch (e) {}
   }
 
   async function startVideoAfterLoad(){
     tapStart.classList.remove("show");
-    try { await video.play(); } catch { tapStart.classList.add("show"); }
-    setPlayIcon(); showControls();
+    await triggerFullscreen(); 
+    try{ await video.play(); } catch{ tapStart.classList.add("show"); }
+    setPlayIcon(); setMuteIcon(); showControls();
   }
 
   async function destroyPlayers(){
-    if(hls) { hls.destroy(); hls = null; }
-    if(shakaPlayer) { await shakaPlayer.destroy().catch(()=>{}); shakaPlayer = null; }
-    video.removeAttribute("src"); video.load();
+    if(hls){hls.destroy();hls=null}
+    if(shakaPlayer){await shakaPlayer.destroy().catch(()=>{});shakaPlayer=null}
+    video.removeAttribute("src");video.load();
   }
 
   async function playStream(){
-    const p = getParams(); 
-    if(!p.url) { errorBox.style.display="flex"; return; }
-    titleEl.textContent = p.title; errorBox.style.display="none"; loading.style.display="block";
-
-    try {
+    const p=getParams(); if(!p.url){errTitle.textContent="لا يوجد رابط";errMsg.textContent="الرابط غير صالح";errorBox.style.display="flex";return}
+    titleEl.textContent=p.title||"Beryan Player";errorBox.style.display="none";loading.style.display="block";buffer.style.display="none";
+    try{
       await destroyPlayers();
-      const src = finalUrl(p);
-
+      const src=finalUrl(p);
       if(isMp4(p.url)){
         video.src = src; video.load(); loading.style.display="none"; await startVideoAfterLoad(); return;
       }
-
       if(isMpd(p.url)){
-        shaka.polyfill.installAll(); shakaPlayer = new shaka.Player(video);
-        if(p.ck) { const [kid,key] = p.ck.split(":"); shakaPlayer.configure({drm:{clearKeys:{[kid.trim()]:key.trim()}}}); }
-        shakaPlayer.getNetworkingEngine().registerRequestFilter((type,req)=>{ if(p.ua)req.headers["User-Agent"]=p.ua; if(p.ref)req.headers["Referer"]=p.ref; });
+        shaka.polyfill.installAll(); shakaPlayer=new shaka.Player(video);
+        if(p.ck&&p.ck.includes(":")){const [kid,key]=p.ck.split(":");shakaPlayer.configure({drm:{clearKeys:{[kid.trim()]:key.trim()}}})}
+        const net=shakaPlayer.getNetworkingEngine(); if(net){net.registerRequestFilter((type,req)=>{if(p.ua)req.headers["User-Agent"]=p.ua;if(p.ref)req.headers["Referer"]=p.ref})}
         await shakaPlayer.load(src); loading.style.display="none"; await startVideoAfterLoad();
-      } else {
+      }else{
         if(Hls.isSupported()){
+          // تحسينات السرعة لروابط m3u8
           hls = new Hls({
-            enableWorker: true, lowLatencyMode: true,
-            backBufferLength: 30, maxBufferLength: 10, maxMaxBufferLength: 20,
-            xhrSetup: (xhr) => {
-              if (p.ua) xhr.setRequestHeader("User-Agent", p.ua);
-              if (p.ref) xhr.setRequestHeader("Referer", p.ref);
-            }
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 60,
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            startLevel: -1,
+            testBandwidth: true
           });
-          hls.loadSource(src); hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, async () => { loading.style.display="none"; await startVideoAfterLoad(); });
-          hls.on(Hls.Events.ERROR, (e, d) => { if(d.fatal) { if(d.type===Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad(); else if(d.type===Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError(); else errorBox.style.display="flex"; } });
-        } else { video.src = src; video.load(); loading.style.display="none"; await startVideoAfterLoad(); }
+          hls.loadSource(src);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED,async()=>{loading.style.display="none";await startVideoAfterLoad()});
+          hls.on(Hls.Events.ERROR, (event, data) => { if(data.fatal) { switch(data.type){ case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break; case Hls.ErrorTypes.MEDIA_ERROR: hls.recoverMediaError(); break; default: destroyPlayers(); break; } } });
+        }else{video.src=src;video.load();loading.style.display="none";await startVideoAfterLoad()}
       }
-    } catch(e) { errorBox.style.display="flex"; loading.style.display="none"; }
+    }catch(e){errorBox.style.display="flex"}
   }
 
-  playBtn.onclick = async e => { e.stopPropagation(); video.paused ? await video.play() : video.pause(); setPlayIcon(); showControls(); };
-  $("rew").onclick = e => { e.stopPropagation(); video.currentTime -= 10; showControls(); };
-  $("fwd").onclick = e => { e.stopPropagation(); video.currentTime += 10; showControls(); };
-  muteBtn.onclick = e => { e.stopPropagation(); video.muted = !video.muted; setMuteIcon(); showControls(); };
-  fitBtn.onclick = e => { e.stopPropagation(); const modes=["fit-contain","fit-cover","fit-fill"]; video.classList.remove(...modes); fitIndex=(fitIndex+1)%3; video.classList.add(modes[fitIndex]); showControls(); };
+  playBtn.onclick=async e=>{e.stopPropagation();if(video.paused)await video.play();else video.pause();setPlayIcon();showControls()};
+  $("rew").onclick=e=>{e.stopPropagation();video.currentTime-=5;showControls()};
+  $("fwd").onclick=e=>{e.stopPropagation();video.currentTime+=15;showControls()};
+  muteBtn.onclick=e=>{e.stopPropagation();video.muted=!video.muted;setMuteIcon();showControls()};
+  fitBtn.onclick=e=>{e.stopPropagation();const modes=["fit-contain","fit-cover","fit-fill"];video.classList.remove(...modes);fitIndex=(fitIndex+1)%modes.length;video.classList.add(modes[fitIndex]);showControls()};
   
-  fullBtn.onclick = async e => {
+  fullBtn.onclick = async (e) => {
     e.stopPropagation();
-    if (!document.fullscreenElement) await wrap.requestFullscreen().catch(()=>{});
-    else document.exitFullscreen();
+    if (!document.fullscreenElement) {
+        await triggerFullscreen();
+        fullBtn.innerHTML = `<i data-feather="minimize"></i>`;
+    } else {
+        if(document.exitFullscreen) document.exitFullscreen();
+        fullBtn.innerHTML = `<i data-feather="maximize"></i>`;
+    }
+    feather.replace(); showControls();
+  };
+
+  progress.onclick=e=>{
+    const r=progress.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width;
+    video.currentTime=x*video.duration;
     showControls();
   };
 
-  progress.onclick = e => {
-    const r = progress.getBoundingClientRect();
-    video.currentTime = ((e.clientX - r.left) / r.width) * video.duration;
-    showControls();
-  };
-
-  tapStart.onclick = () => startVideoAfterLoad();
-  $("back").onclick = () => history.back();
-  video.addEventListener("waiting", () => buffer.style.display="block");
-  video.addEventListener("playing", () => buffer.style.display="none");
-  video.addEventListener("timeupdate", updateProgress);
-  wrap.onclick = showControls;
-  $("retry").onclick = () => playStream();
-  playStream();
+  tapStart.onclick=async()=>{await startVideoAfterLoad()};
+  $("back").onclick=()=>history.back();
+  video.addEventListener("waiting",()=>buffer.style.display="block");
+  video.addEventListener("playing",()=>buffer.style.display="none");
+  video.addEventListener("timeupdate",updateProgress);
+  wrap.onclick=showControls;
+  $("retry").onclick=()=>playStream();
+  buildServerButtons();playStream();
 });
 </script>
 </body>
